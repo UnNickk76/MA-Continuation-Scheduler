@@ -29,6 +29,10 @@ jobs:
           MA_OIDC_TOKEN: ${{ steps.oidc.outputs.token }}
         run: |
           set -euo pipefail
-          curl -fsS --retry 2 --retry-delay 10 -X POST \
+          http_code="$(curl -sS --retry 2 --retry-delay 10 -o /tmp/ma-continuation-response.json -w '%{http_code}' -X POST \
             -H "Authorization: Bearer ${MA_OIDC_TOKEN}" \
-            https://ma-workspace-2.onrender.com/api/continuation/tick
+            https://ma-workspace-2.onrender.com/api/continuation/tick)"
+          cat /tmp/ma-continuation-response.json
+          echo
+          echo "HTTP ${http_code}"
+          test "${http_code}" = "200"
